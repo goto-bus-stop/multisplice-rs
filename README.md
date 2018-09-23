@@ -2,14 +2,16 @@
 
 easily splice a string multiple times, using offsets into the original string
 
-[![npm][npm-image]][npm-url]
+[![crates][crates-image]][crates-url]
 [![travis][travis-image]][travis-url]
-[![standard][standard-image]][standard-url]
+[![docs][docs-image]][docs-url]
 
-[npm-image]: https://img.shields.io/npm/v/multisplice.svg?style=flat-square
-[npm-url]: https://www.npmjs.com/package/multisplice
-[travis-image]: https://img.shields.io/travis/goto-bus-stop/multisplice.svg?style=flat-square
-[travis-url]: https://travis-ci.org/goto-bus-stop/multisplice
+[crates-image]: https://img.shields.io/crates/v/multisplice.svg?style=flat-square
+[crates-url]: https://crates.io/crates/multisplice
+[travis-image]: https://img.shields.io/travis/com/goto-bus-stop/multisplice-rs.svg?style=flat-square
+[travis-url]: https://travis-ci.com/goto-bus-stop/multisplice-rs
+[docs-image]: https://docs.rs/multisplice/badge.svg
+[docs-url]: https://docs.rs/multisplice
 
 ## Install
 
