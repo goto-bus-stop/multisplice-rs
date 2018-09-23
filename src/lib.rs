@@ -12,7 +12,10 @@
 //! splicer.splice(2, 3, "beep");
 //! splicer.splice(6, 7, "boop");
 //! assert_eq!(splicer.to_string(), "a beep c boop e".to_string());
+//! assert_eq!(splicer.slice_range((3..7)), " c boop".to_string());
 //! ```
+
+use std::ops::{Bound, RangeBounds};
 
 /// A single splice range.
 struct Splice<'a> {
@@ -62,10 +65,10 @@ impl<'a> Multisplice<'a> {
 
     /// Get a part of the spliced string, using indices `start` to `end` (exclusive) from the
     /// original string.
-    /// If `start` is in the middle of a spliced range, that splice is not included in the return
-    /// value. (TODO fix)
-    /// If `end` is in the middle of a spliced range, the full new value is included in the return
-    /// value.
+    /// If the `start` or `end` indices are in the middle of a spliced range, the full value of the
+    /// splice is included in the return value. For example, when indices 1-10 were replaced with a
+    /// value "Hello World", requesting a slice of indices 7-20 will return the entire "Hello
+    /// World" string followed by indices 11-20.
     pub fn slice(&self, start: usize, end: usize) -> String {
         assert!(end <= self.source.len());
 
@@ -73,7 +76,7 @@ impl<'a> Multisplice<'a> {
         let mut last = start;
         for s in &self.splices {
             // ignore splices that are entirely contained in an earlier spliced range
-            if s.end < last { continue }
+            if s.end <= last { continue }
             // ignore splices after the end of the source
             if s.start >= end { break }
             if s.start >= last {
@@ -89,6 +92,36 @@ impl<'a> Multisplice<'a> {
         }
 
         result
+    }
+
+    /// Slice using range syntax.
+    ///
+    /// ```rust
+    /// use multisplice::Multisplice;
+    ///
+    /// let source = "a b c d e";
+    /// let mut splicer = Multisplice::new(source);
+    /// splicer.splice(2, 3, "beep");
+    /// splicer.splice(6, 7, "boop");
+    /// assert_eq!(splicer.slice_range((..)), "a beep c boop e".to_string());
+    /// assert_eq!(splicer.slice_range((2..)), "beep c boop e".to_string());
+    /// assert_eq!(splicer.slice_range((3..7)), " c boop".to_string());
+    /// assert_eq!(splicer.slice_range((4..=6)), "c boop".to_string());
+    /// ```
+    pub fn slice_range<R>(&self, range: R) -> String
+        where R: RangeBounds<usize>
+    {
+        let start = match range.start_bound() {
+            Bound::Included(n) => *n,
+            Bound::Excluded(n) => *n + 1,
+            Bound::Unbounded => 0,
+        };
+        let end = match range.end_bound() {
+            Bound::Included(n) => *n + 1,
+            Bound::Excluded(n) => *n,
+            Bound::Unbounded => self.source.len(),
+        };
+        self.slice(start, end)
     }
 
     /// Execute the splices, returning the new string.
