@@ -1,0 +1,7 @@
+[package]
+name = "multisplice"
+version = "0.1.0"
+description = "easily splice a string multiple times, using offsets into the original string"
+authors = ["Renée Kooi <renee@kooi.me>"]
+
+[dependencies]
