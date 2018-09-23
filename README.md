@@ -19,7 +19,7 @@ In Cargo.toml:
 
 ```toml
 [dependencies]
-multisplice = "1.0"
+multisplice = "0.1"
 ```
 
 ## API
