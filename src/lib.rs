@@ -50,7 +50,10 @@ impl<'a> Multisplice<'a> {
         // Sorted insert
         let mut insert_at = None;
         for (i, s) in self.splices.iter().enumerate() {
-            assert!(!(s.start <= start && s.end > start), "Trying to splice an already spliced range");
+            assert!(
+                !(s.start <= start && s.end > start),
+                "Trying to splice an already spliced range"
+            );
             if s.start > start {
                 insert_at = Some(i);
                 break;
@@ -76,9 +79,13 @@ impl<'a> Multisplice<'a> {
         let mut last = start;
         for s in &self.splices {
             // ignore splices that are entirely contained in an earlier spliced range
-            if s.end <= last { continue }
+            if s.end <= last {
+                continue;
+            }
             // ignore splices after the end of the source
-            if s.start >= end { break }
+            if s.start >= end {
+                break;
+            }
             if s.start >= last {
                 result.push_str(&self.source[last..s.start]);
             }
@@ -109,7 +116,8 @@ impl<'a> Multisplice<'a> {
     /// assert_eq!(splicer.slice_range((4..=6)), "c boop".to_string());
     /// ```
     pub fn slice_range<R>(&self, range: R) -> String
-        where R: RangeBounds<usize>
+    where
+        R: RangeBounds<usize>,
     {
         let start = match range.start_bound() {
             Bound::Included(n) => *n,
@@ -132,7 +140,7 @@ impl<'a> Multisplice<'a> {
 
 #[cfg(test)]
 mod tests {
-    use ::Multisplice;
+    use Multisplice;
 
     #[test]
     fn splice() {
