@@ -140,7 +140,7 @@ impl<'a> Multisplice<'a> {
 
 #[cfg(test)]
 mod tests {
-    use Multisplice;
+    use super::*;
 
     #[test]
     fn splice() {
