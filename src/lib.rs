@@ -15,7 +15,8 @@
 //! assert_eq!(splicer.slice_range((3..7)), " c boop".to_string());
 //! ```
 
-use std::ops::{Bound, RangeBounds};
+use std::borrow::Cow;
+use core::ops::{Bound, RangeBounds};
 
 /// A single splice range.
 struct Splice<'a> {
@@ -72,19 +73,23 @@ impl<'a> Multisplice<'a> {
     /// splice is included in the return value. For example, when indices 1-10 were replaced with a
     /// value "Hello World", requesting a slice of indices 7-20 will return the entire "Hello
     /// World" string followed by indices 11-20.
-    pub fn slice(&self, start: usize, end: usize) -> String {
+    pub fn slice(&self, start: usize, end: usize) -> Cow<'_, str> {
         assert!(end <= self.source.len());
+
+        let mut splices = self.splices.iter()
+            .filter(|s| s.end > start && s.start < end)
+            .peekable();
+
+        if splices.peek().is_none() {
+            return Cow::from(&self.source[start..end]);
+        }
 
         let mut result = String::new();
         let mut last = start;
-        for s in &self.splices {
+        for s in splices {
             // ignore splices that are entirely contained in an earlier spliced range
             if s.end <= last {
                 continue;
-            }
-            // ignore splices after the end of the source
-            if s.start >= end {
-                break;
             }
             if s.start >= last {
                 result.push_str(&self.source[last..s.start]);
@@ -98,7 +103,7 @@ impl<'a> Multisplice<'a> {
             result.push_str(&self.source[last..end]);
         }
 
-        result
+        Cow::from(result)
     }
 
     /// Slice using range syntax.
@@ -115,7 +120,7 @@ impl<'a> Multisplice<'a> {
     /// assert_eq!(splicer.slice_range((3..7)), " c boop".to_string());
     /// assert_eq!(splicer.slice_range((4..=6)), "c boop".to_string());
     /// ```
-    pub fn slice_range<R>(&self, range: R) -> String
+    pub fn slice_range<R>(&self, range: R) -> Cow<'_, str>
     where
         R: RangeBounds<usize>,
     {
@@ -134,7 +139,7 @@ impl<'a> Multisplice<'a> {
 
     /// Execute the splices, returning the new string.
     pub fn to_string(&self) -> String {
-        self.slice(0, self.source.len())
+        self.slice(0, self.source.len()).into_owned()
     }
 }
 
@@ -155,7 +160,7 @@ mod tests {
         let mut splicer = Multisplice::new("a b c d e");
         splicer.splice(2, 3, "beep");
         splicer.splice(6, 7, "boop");
-        assert_eq!(splicer.slice(2, 5), "beep c".to_string());
+        assert_eq!(splicer.slice(2, 5).into_owned(), "beep c".to_string());
     }
 
     #[test]
@@ -163,7 +168,7 @@ mod tests {
         let mut splicer = Multisplice::new("a b c d e");
         splicer.splice(2, 7, "beep and boop");
         assert_eq!(splicer.to_string(), "a beep and boop e".to_string());
-        assert_eq!(splicer.slice(0, 5), "a beep and boop".to_string());
-        assert_eq!(splicer.slice(6, 9), "beep and boop e".to_string());
+        assert_eq!(splicer.slice(0, 5).into_owned(), "a beep and boop".to_string());
+        assert_eq!(splicer.slice(6, 9).into_owned(), "beep and boop e".to_string());
     }
 }
