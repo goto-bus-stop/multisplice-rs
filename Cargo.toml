@@ -6,7 +6,6 @@ authors = ["Renée Kooi <renee@kooi.me>"]
 edition = "2018"
 repository = "https://github.com/goto-bus-stop/multisplice-rs"
 homepage = "https://github.com/goto-bus-stop/multisplice-rs"
-license-file = "LICENSE.md"
 license = "Apache-2.0"
 
 [dependencies]

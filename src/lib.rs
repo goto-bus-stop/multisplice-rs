@@ -15,6 +15,13 @@
 //! assert_eq!(splicer.slice_range((3..7)), " c boop".to_string());
 //! ```
 
+#![deny(future_incompatible)]
+#![deny(nonstandard_style)]
+#![deny(rust_2018_idioms)]
+#![deny(unsafe_code)]
+#![warn(missing_docs)]
+#![warn(unused)]
+
 use std::ops::{Bound, RangeBounds};
 
 /// A single splice range.
@@ -37,6 +44,7 @@ pub struct Multisplice<'a> {
 
 impl<'a> Multisplice<'a> {
     /// Create a "multisplicer" for the given string.
+    #[inline]
     pub fn new(source: &'a str) -> Self {
         Multisplice {
             source,
@@ -133,6 +141,7 @@ impl<'a> Multisplice<'a> {
     }
 
     /// Execute the splices, returning the new string.
+    #[inline]
     pub fn to_string(&self) -> String {
         self.slice(0, self.source.len())
     }
