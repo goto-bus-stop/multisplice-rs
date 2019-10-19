@@ -9,8 +9,10 @@
 //!
 //! let source = "a b c d e";
 //! let mut splicer = Multisplice::new(source);
+//! // static string
 //! splicer.splice(2, 3, "beep");
-//! splicer.splice(6, 7, "boop");
+//! // owned string
+//! splicer.splice(6, 7, "boop".to_string());
 //! assert_eq!(splicer.to_string(), "a beep c boop e".to_string());
 //! assert_eq!(splicer.slice_range((3..7)), " c boop".to_string());
 //! ```
@@ -57,6 +59,9 @@ impl<'a> Multisplice<'a> {
 
     /// Replace the characters from index `start` up to (but not including) index `end` by the
     /// string `value`.
+    ///
+    /// If the replacement lifetime outlives the input string, you can pass in cheap &str references.
+    /// Else, pass in an owned String using `replacement.to_string()`.
     #[inline]
     pub fn splice(&mut self, start: usize, end: usize, value: impl Into<Cow<'a, str>>) {
         self.splice_cow(start, end, value.into())
