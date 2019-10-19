@@ -151,10 +151,12 @@ impl<'a> Multisplice<'a> {
         };
         self.slice(start, end)
     }
+}
 
+impl ToString for Multisplice<'_> {
     /// Execute the splices, returning the new string.
     #[inline]
-    pub fn to_string(&self) -> String {
+    fn to_string(&self) -> String {
         self.slice_range(..)
     }
 }
