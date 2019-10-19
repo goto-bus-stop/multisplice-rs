@@ -57,6 +57,7 @@ impl<'a> Multisplice<'a> {
 
     /// Replace the characters from index `start` up to (but not including) index `end` by the
     /// string `value`.
+    #[inline]
     pub fn splice(&mut self, start: usize, end: usize, value: impl Into<Cow<'a, str>>) {
         self.splice_cow(start, end, value.into())
     }
@@ -136,10 +137,8 @@ impl<'a> Multisplice<'a> {
     /// assert_eq!(splicer.slice_range((3..7)), " c boop".to_string());
     /// assert_eq!(splicer.slice_range((4..=6)), "c boop".to_string());
     /// ```
-    pub fn slice_range<R>(&self, range: R) -> String
-    where
-        R: RangeBounds<usize>,
-    {
+    #[inline]
+    pub fn slice_range(&self, range: impl RangeBounds<usize>) -> String {
         let start = match range.start_bound() {
             Bound::Included(n) => *n,
             Bound::Excluded(n) => *n + 1,
